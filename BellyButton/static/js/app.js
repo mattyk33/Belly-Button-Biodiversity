@@ -40,14 +40,14 @@ function init() {
         };
 
         // Call the functions to display the data and the plots to the page
-        buildPlot(data.names[0]);
+        buildPlots(data.names[0]);
         getData(data.names[0]);
     });
 }
 
 // Create the function for the change event
 function optionChanged(id) {
-    buildPlot(id);
+    buildPlots(id);
     getData(id);
 }
 
@@ -70,6 +70,95 @@ function getData(id) {
             demographTable.append("h5").text(`${key}:${value}`);
 
         });
+    });
+}
+
+// Create a function to plot charts
+function buildPlots(id) {
+
+    // read in the JSON data
+    d3.json("data/samples.json").then((data) => {
+
+        // Filter samples for plotting
+        var sample = data.samples.filter(samp => samp.id == id)[0];
+
+        // Create empty arrays for sample data
+        var otuIds = [];
+        var otuLabels = [];
+        var sampleValues = [];
+
+        // Iterate through each key and value in the sample
+        Object.entries(sample).forEach(([key, value]) => {
+
+            switch (key) {
+                case "otu_ids":
+                    otuIds.push(value);
+                    break;
+                case "sample_values":
+                    sampleValues.push(value);
+                    break;
+                case "otu_labels":
+                    otuLabels.push(value);
+                    break;
+                default:
+                    break;
+            }
+
+        });
+
+        // slice and reverse the arrays to get the top 10 values, labels and IDs
+        var topOtuIds = otuIds[0].slice(0, 10).reverse();
+        var topOtuLabels = otuLabels[0].slice(0, 10).reverse();
+        var topSampleValues = sampleValues[0].slice(0, 10).reverse();
+
+        // use the map function to store the IDs with "OTU" for labelling y-axis
+        var topOtuIdsFormat = topOtuIds.map(otuID => "OTU " + otuID);
+
+        // PLOT BAR CHART
+
+        // Create trace
+        var barTrace = {
+            x: topSampleValues,
+            y: topOtuIdsFormat,
+            text: topOtuLabels,
+            type: 'bar',
+            orientation: 'h',
+            marker: {
+                color: 'rgb(125,145,192)'
+            }
+        };
+
+        // Create data array
+        var barData = [barTrace];
+
+        // Define plot layout
+        var barLayout = {
+            height: 500,
+            width: 500,
+            hoverlabel: {
+                font: {
+                    family: 'Arno Pro'
+                }
+            },
+            title: {
+                text: `<b>Top OTUs for Test Subject ${id}</b>`,
+                font: {
+                    size: 16,
+                    color: 'rgb(50,171,96)'
+                }
+            },
+            xaxis: {
+                title: "<b>Sample values<b>",
+                color: 'rgb(50,171,96)'
+            },
+            yaxis: {
+                tickfont: { size: 14 }
+            }
+        }
+
+
+        // plot the bar chart to the "bar" div
+        Plotly.newPlot("bar", barData, barLayout);
     });
 }
 
