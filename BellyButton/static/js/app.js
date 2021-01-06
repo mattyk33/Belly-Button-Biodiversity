@@ -36,7 +36,7 @@ function init() {
         
         // Append id data to the dropdwown menu
         for (var i = 0; i < idNumber.length; i++) {
-            dropDownMenu.append("option").text(unpack(idNumber, i)).property("value", unpack(idNumber, i));
+            dropDownMenu.append("option").text(unpack(idNumber, i));
         };
 
         // Call the functions to display the data and the plots to the page
@@ -67,7 +67,7 @@ function getData(id) {
 
         // Iterate through each key and value in the metadata
         Object.entries(result).forEach(([key, value]) => {
-            demographTable.append("h5").text(`${key}:${value}`);
+            demographTable.append("h5").text(`${key}: ${value}`);
 
         });
     });
@@ -106,15 +106,17 @@ function buildPlots(id) {
 
         });
 
-        // slice and reverse the arrays to get the top 10 values, labels and IDs
+        // Slice and reverse the arrays to get the top 10
         var topOtuIds = otuIds[0].slice(0, 10).reverse();
         var topOtuLabels = otuLabels[0].slice(0, 10).reverse();
         var topSampleValues = sampleValues[0].slice(0, 10).reverse();
 
-        // use the map function to store the IDs with "OTU" for labelling y-axis
+        // "OTU" labels added to topOtuIds
         var topOtuIdsFormat = topOtuIds.map(otuID => "OTU " + otuID);
 
+
         // PLOT BAR CHART
+
 
         // Create trace
         var barTrace = {
@@ -157,8 +159,56 @@ function buildPlots(id) {
         }
 
 
-        // plot the bar chart to the "bar" div
+        // Plot Bar Chart
         Plotly.newPlot("bar", barData, barLayout);
+
+
+        // PLOT BUBBLE CHART
+
+
+        // Create trace
+        var bubTrace = {
+            x: otuIds,
+            y: sampleValues,
+            text: otuLabels,
+            mode: 'markers',
+            marker: {
+                size: sampleValues.map(s => s),
+                color: otuIds.map(d => d),
+                colorscale: 'Electric'
+            },
+            type: 'scatter'
+        };
+
+        // Create data array
+        var bubData = [bubTrace];
+
+        // Define plot layout
+        var bubLayout = {
+            font: {
+                family: 'Arno Pro'
+            },
+            hovermode: "closest",
+            hoverlabel: {
+                font: {
+                    family: 'Arno Pro'
+                }
+            },
+            xaxis: {
+                title: "<b>OTU Id</b>",
+                color: 'rgb(70,80,150)'
+            },
+            yaxis: {
+                title: "<b>Sample Values</b>",
+                color: 'rgb(70,80,150)'
+            },
+            showlegend: false,
+        };
+
+        // Plot Bubble Chart
+        Plotly.newPlot('bubble', bubData, bubLayout);
+
+
     });
 }
 
