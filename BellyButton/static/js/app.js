@@ -13,18 +13,6 @@ var bubbleChart = d3.select("#bubble");
 // select the gauge chart div
 var gaugeChart = d3.select("#gauge");
 
-/**
- * Helper function to select data
- * Returns an array of values
- * @param {array} rows
- * @param {integer} index
- */
-
-function unpack(rows, index) {
-    return rows.map(function(row) {
-      return row[index];
-    });
-  }
 
 // Create the function for the initial data rendering
 function init() {
@@ -36,7 +24,7 @@ function init() {
         
         // Append id data to the dropdwown menu
         for (var i = 0; i < idNumber.length; i++) {
-            dropDownMenu.append("option").text(unpack(idNumber, i));
+            dropDownMenu.append("option").text(idNumber[i]);
         };
 
         // Call the functions to display the data and the plots to the page
@@ -81,7 +69,7 @@ function buildPlots(id) {
 
         // Filter samples for plotting
         var sample = data.samples.filter(samp => samp.id == id)[0];
-
+        console.log(sample)
         // Create empty arrays for sample data
         var otuIds = [];
         var otuLabels = [];
@@ -110,7 +98,9 @@ function buildPlots(id) {
         var topOtuIds = otuIds[0].slice(0, 10).reverse();
         var topOtuLabels = otuLabels[0].slice(0, 10).reverse();
         var topSampleValues = sampleValues[0].slice(0, 10).reverse();
-
+        console.log(topOtuIds)
+        console.log(topOtuLabels)
+        console.log(topSampleValues)
         // "OTU" labels added to topOtuIds
         var topOtuIdsFormat = topOtuIds.map(otuID => "OTU " + otuID);
 
@@ -166,15 +156,23 @@ function buildPlots(id) {
         // PLOT BUBBLE CHART
 
 
+        // Creat variables
+        var sam = data.samples.filter(samp => samp.id == id)[0];
+
+        var xvalues = sam.otu_ids;
+        var yvalues = sam.sample_values;
+        var textvalues = sam.otu_labels;
+        console.log(yvalues)
         // Create trace
+        
         var bubTrace = {
-            x: otuIds,
-            y: sampleValues,
-            text: otuLabels,
+            x: xvalues,
+            y: yvalues,
+            text: textvalues,
             mode: 'markers',
             marker: {
-                size: sampleValues.map(s => s),
-                color: otuIds.map(d => d),
+                size: yvalues,
+                color: xvalues,
                 colorscale: 'Electric'
             },
             type: 'scatter'
