@@ -116,7 +116,7 @@ function buildPlots(id) {
             type: 'bar',
             orientation: 'h',
             marker: {
-                color: 'rgb(125,145,192)'
+                color: 'rgb(100,45,80)'
             }
         };
 
@@ -146,7 +146,7 @@ function buildPlots(id) {
             yaxis: {
                 tickfont: { size: 14 }
             }
-        }
+        };
 
 
         // Plot Bar Chart
@@ -163,8 +163,8 @@ function buildPlots(id) {
         var yvalues = sam.sample_values;
         var textvalues = sam.otu_labels;
         console.log(yvalues)
+
         // Create trace
-        
         var bubTrace = {
             x: xvalues,
             y: yvalues,
@@ -206,6 +206,50 @@ function buildPlots(id) {
         // Plot Bubble Chart
         Plotly.newPlot('bubble', bubData, bubLayout);
 
+
+        // PLOT GAUGE CHART
+
+
+        // Create variables
+        var metaResult = data.metadata.filter(meta => meta.id.toString() === id)[0];
+        var washfreq = metaResult.wfreq;
+
+        // Create data array
+        var gaugeData = [
+            {
+            domain: { x: [0, 1], y: [0, 1] },
+            value: parseFloat(washfreq),
+            title: { text: `Belly Button Scrubs Per Week` },
+            type: "indicator",
+            
+            mode: "gauge+number",
+            gauge: { axis: { range: [null, 9] },
+                     bar: { color: "red" },
+                     steps: [
+                      { range: [0, 1], color: 'rgb(0,140,0)' },
+                      { range: [1, 2], color: 'rgb(0,130,0)' },
+                      { range: [2, 3], color: 'rgb(0,120,0)' },
+                      { range: [3, 4], color: 'rgb(0,110,0)' },
+                      { range: [4, 5], color: 'rgb(0,100,0)' },
+                      { range: [5, 6], color: 'rgb(0,90,0)' },
+                      { range: [6, 7], color: 'rgb(0,80,0)' },
+                      { range: [7, 8], color: 'rgb(0,70,0)' },
+                      { range: [8, 9], color: 'rgb(0,60,0)' },
+                    ]}
+                
+            }
+          ];
+
+        // Define plot layout
+          var gaugeLayout = { 
+              width: 600, 
+              height: 600, 
+              margin: { t: 20, b: 40, l:100, r:100 },
+              font: { color: "darkblue", family: "Arial" }
+            };
+
+        // Plot Gauge Chart
+        Plotly.newPlot("gauge", gaugeData, gaugeLayout);   
 
     });
 }
